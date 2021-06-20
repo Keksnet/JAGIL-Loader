@@ -1,0 +1,5 @@
+name: JAGIL
+version: 1.6
+api-version: 1.16
+author: Neo8
+main: de.neo.jagil.JAGILLoader
