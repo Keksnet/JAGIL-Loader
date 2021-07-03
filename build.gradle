@@ -14,23 +14,25 @@ plugins {
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '1.6'
+version = '1.7'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 15
+targetCompatibility = 15
 
 repositories {
 	mavenCentral();
 	maven {
+		name 'repo.neo8.de'
 		allowInsecureProtocol true
 		url 'http://repo.neo8.de/'
 	}
 	maven {
+		name 'SpigotMC'
 		url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
 	}
 }
 
 dependencies {
-	implementation 'de.neo.jagil:JAGIL:1.5'
-	compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+	//implementation 'de.neo.jagil:JAGIL:1.7'
 }
