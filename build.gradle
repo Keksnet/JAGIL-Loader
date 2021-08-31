@@ -14,7 +14,7 @@ plugins {
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '2.1.1'
+version = '2.1.2'
 
 sourceCompatibility = 16
 targetCompatibility = 16
