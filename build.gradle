@@ -12,15 +12,17 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
+compileJava.options.encoding = 'UTF-8'
+
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '2.1.3'
+version = '2.2.0.1_7'
 
 sourceCompatibility = 16
 targetCompatibility = 16
 
 repositories {
-	mavenCentral();
+	mavenCentral()
 	maven {
 		name 'repo.neo8.de'
 		allowInsecureProtocol true
@@ -34,5 +36,5 @@ repositories {
 
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-	implementation 'de.neo.jagil:JAGIL:2.1.2'
+	implementation 'de.neo.jagil:JAGIL:2.2.0_4'
 }
