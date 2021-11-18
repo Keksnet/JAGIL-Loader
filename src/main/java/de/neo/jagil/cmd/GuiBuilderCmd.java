@@ -139,15 +139,19 @@ public class GuiBuilderCmd implements CommandExecutor {
             writer.writeEndElement();
 
 
-            writer.writeStartElement("enchantment");
+            writer.writeStartElement("enchantments");
 
             for(GUI.XmlEnchantment enchantment : item.enchantments) {
+                writer.writeStartElement("enchantment");
+
                 writer.writeStartElement("enchantmentName");
                 writer.writeCharacters(enchantment.enchantment.toString().toUpperCase());
                 writer.writeEndElement();
 
                 writer.writeStartElement("enchantmentLevel");
                 writer.writeCharacters(String.valueOf(enchantment.level));
+                writer.writeEndElement();
+
                 writer.writeEndElement();
             }
 
