@@ -29,9 +29,14 @@ repositories {
 		name 'SpigotMC'
 		url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
 	}
+	maven {
+		name 'minecraft-libs'
+		url 'https://libraries.minecraft.net/'
+	}
 }
 
 dependencies {
+	compileOnly 'com.mojang:authlib:2.1.28'
 	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
 	implementation 'de.neo.jagil:JAGIL:3.2.0'
 }

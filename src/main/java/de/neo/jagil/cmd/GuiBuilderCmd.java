@@ -1,8 +1,10 @@
 package de.neo.jagil.cmd;
 
+import com.mojang.authlib.GameProfile;
 import de.neo.jagil.JAGILLoader;
 import de.neo.jagil.gui.GUI;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -62,6 +65,16 @@ public class GuiBuilderCmd implements CommandExecutor {
                     XmlItem xmlItem = new XmlItem();
                     xmlItem.slot = i;
                     xmlItem.material = is.getType();
+                    if(xmlItem.material.equals(Material.PLAYER_HEAD)) {
+                        try {
+                            ((XmlHead)xmlItem).texture = ((GameProfile)((SkullMeta)is.getItemMeta()).getClass().getDeclaredField("profile")
+                                    .get(is.getItemMeta())).getProperties().get("texture").iterator().next().getValue();
+                        } catch (IllegalAccessException ex) {
+                            ex.printStackTrace();
+                        } catch (NoSuchFieldException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
                         XmlEnchantment xmlEnchantment = new XmlEnchantment();
                         xmlEnchantment.enchantment = entry.getKey();
@@ -138,6 +151,11 @@ public class GuiBuilderCmd implements CommandExecutor {
 
             writer.writeEndElement();
 
+            if(item.material.equals(Material.PLAYER_HEAD)) {
+                writer.writeStartElement("base64");
+                writer.writeCharacters(((GUI.XmlHead)item).texture);
+                writer.writeEndElement();
+            }
 
             writer.writeStartElement("enchantments");
 
