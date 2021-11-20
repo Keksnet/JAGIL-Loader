@@ -16,7 +16,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '3.1.2_patch1'
+version = '3.2.0'
 
 repositories {
 	mavenCentral()
@@ -33,5 +33,5 @@ repositories {
 
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-	implementation 'de.neo.jagil:JAGIL:3.1.2_patch1'
+	implementation 'de.neo.jagil:JAGIL:3.2.0'
 }
