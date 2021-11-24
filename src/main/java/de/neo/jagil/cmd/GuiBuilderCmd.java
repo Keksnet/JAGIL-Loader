@@ -3,6 +3,7 @@ package de.neo.jagil.cmd;
 import com.mojang.authlib.GameProfile;
 import de.neo.jagil.JAGILLoader;
 import de.neo.jagil.gui.GUI;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -22,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,6 +47,7 @@ public class GuiBuilderCmd implements CommandExecutor {
         public BuilderGui(String name, int size, String file, OfflinePlayer p) {
             super(name, size, p);
             this.xmlGui = new GUI.XmlGui();
+            this.xmlGui.size = size;
             this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
         }
 
@@ -62,17 +66,43 @@ public class GuiBuilderCmd implements CommandExecutor {
             for(int i = 0; i < getInventory().getContents().length; i++) {
                 ItemStack is = getInventory().getContents()[i];
                 if(is != null) {
-                    XmlItem xmlItem = new XmlItem();
+                    XmlHead xmlItem = new XmlHead();
                     xmlItem.slot = i;
                     xmlItem.material = is.getType();
                     if(xmlItem.material.equals(Material.PLAYER_HEAD)) {
+                        SkullMeta skullMeta = (SkullMeta) is.getItemMeta();
                         try {
-                            ((XmlHead)xmlItem).texture = ((GameProfile)((SkullMeta)is.getItemMeta()).getClass().getDeclaredField("profile")
-                                    .get(is.getItemMeta())).getProperties().get("texture").iterator().next().getValue();
-                        } catch (IllegalAccessException ex) {
+                            Field profileField = skullMeta.getClass().getDeclaredField("profile");
+                            profileField.setAccessible(true);
+                            GameProfile gp = (GameProfile) profileField.get(skullMeta);
+                            xmlItem.texture = gp.getProperties().get("texture").iterator().next().getValue();
+                        } catch (IllegalAccessException | NoSuchFieldException ex) {
                             ex.printStackTrace();
-                        } catch (NoSuchFieldException ex) {
-                            ex.printStackTrace();
+                            StringBuilder dump = new StringBuilder();
+                            dump.append("Dumping reflection data:\n");
+                            dump.append("Skull Class: ").append(skullMeta.getClass().getName()).append("\n");
+                            dump.append("Available Fields:\n");
+                            for(Field f : skullMeta.getClass().getDeclaredFields()) {
+                                dump.append("Field: ").append(f.getName()).append("\n");
+                                dump.append("Signature: ").append(f).append("\n");
+                                if(Modifier.isStatic(f.getModifiers())) {
+                                    dump.append("Can access: ").append(f.canAccess(null)).append("\n");
+                                }else {
+                                    dump.append("Can access: ").append(f.canAccess(skullMeta)).append("\n");
+                                }
+                                f.setAccessible(true);
+                                try {
+                                    if(Modifier.isStatic(f.getModifiers())) {
+                                        dump.append("Value: ").append(f.get(null)).append("\n");
+                                    }else {
+                                        dump.append("Value: ").append(f.get(skullMeta)).append("\n");
+                                    }
+                                } catch (IllegalAccessException ex1) {
+                                    dump.append("Error getting value: ").append(ex1.getMessage()).append("\n");
+                                }
+                            }
+                            Bukkit.broadcast(dump.toString(), "jagil.debug");
+                            JAGILLoader.getPlugin(JAGILLoader.class).getLogger().warning(dump.toString().trim());
                         }
                     }
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
@@ -106,7 +136,7 @@ public class GuiBuilderCmd implements CommandExecutor {
         }
     }
 
-    private void writeInventoryToFile(GUI.XmlGui json, Path saveFile) throws IOException, XMLStreamException {
+    public static void writeInventoryToFile(GUI.XmlGui json, Path saveFile) throws IOException, XMLStreamException {
         BufferedWriter osw = Files.newBufferedWriter(saveFile);
         XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(osw);
         writer.writeStartDocument();
@@ -143,10 +173,12 @@ public class GuiBuilderCmd implements CommandExecutor {
 
             writer.writeStartElement("lore");
 
-            for(String line : item.lore) {
-                writer.writeStartElement("line");
-                writer.writeCharacters(line);
-                writer.writeEndElement();
+            if(item.lore != null) {
+                for(String line : item.lore) {
+                    writer.writeStartElement("line");
+                    writer.writeCharacters(line);
+                    writer.writeEndElement();
+                }
             }
 
             writer.writeEndElement();
@@ -159,19 +191,23 @@ public class GuiBuilderCmd implements CommandExecutor {
 
             writer.writeStartElement("enchantments");
 
-            for(GUI.XmlEnchantment enchantment : item.enchantments) {
-                writer.writeStartElement("enchantment");
+            if(item.enchantments != null) {
+                for(GUI.XmlEnchantment enchantment : item.enchantments) {
+                    writer.writeStartElement("enchantment");
 
-                writer.writeStartElement("enchantmentName");
-                writer.writeCharacters(enchantment.enchantment.toString().toUpperCase());
-                writer.writeEndElement();
+                    writer.writeStartElement("enchantmentName");
+                    writer.writeCharacters(enchantment.enchantment.toString().toUpperCase());
+                    writer.writeEndElement();
 
-                writer.writeStartElement("enchantmentLevel");
-                writer.writeCharacters(String.valueOf(enchantment.level));
-                writer.writeEndElement();
+                    writer.writeStartElement("enchantmentLevel");
+                    writer.writeCharacters(String.valueOf(enchantment.level));
+                    writer.writeEndElement();
 
-                writer.writeEndElement();
+                    writer.writeEndElement();
+                }
             }
+
+            writer.writeEndElement();
 
             writer.writeEndElement();
         }

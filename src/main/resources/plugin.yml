@@ -1,7 +1,8 @@
 name: JAGIL
-version: 3.2.0
+version: 3.2.1
 api-version: 1.17
 author: Neo8
 main: de.neo.jagil.JAGILLoader
 commands:
   guibuilder:
+  guiexport:
