@@ -16,10 +16,11 @@ compileJava.options.encoding = 'UTF-8'
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '3.2.3'
+version = '3.2.4'
 
 repositories {
 	mavenCentral()
+	mavenLocal()
 	maven {
 		name 'repo.neo8.de'
 		url 'https://repo.neo8.de/'
@@ -37,5 +38,5 @@ repositories {
 dependencies {
 	compileOnly 'com.mojang:authlib:2.1.28'
 	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-	implementation 'de.neo.jagil:JAGIL:3.2.3'
+	implementation 'de.neo.jagil:JAGIL:3.2.4'
 }
