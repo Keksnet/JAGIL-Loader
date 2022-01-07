@@ -75,7 +75,7 @@ public class GuiBuilderCmd implements CommandExecutor {
                             Field profileField = skullMeta.getClass().getDeclaredField("profile");
                             profileField.setAccessible(true);
                             GameProfile gp = (GameProfile) profileField.get(skullMeta);
-                            xmlItem.texture = gp.getProperties().get("texture").iterator().next().getValue();
+                            xmlItem.texture = gp.getProperties().get("textures").iterator().next().getValue();
                         } catch (IllegalAccessException | NoSuchFieldException ex) {
                             ex.printStackTrace();
                             StringBuilder dump = new StringBuilder();
