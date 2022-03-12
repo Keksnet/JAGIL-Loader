@@ -65,7 +65,7 @@ public class GuiExportCmd implements CommandExecutor {
                         p.sendMessage("§aSize: " + size);
                         p.sendMessage("§aFile: " + file);
                         p.sendMessage("§aName: " + name);
-                        GUI.XmlGui gui = convert(container.getInventory());
+                        GUI.DataGui gui = convert(container.getInventory());
                         gui.size = size;
                         gui.name = name;
                         try {
@@ -84,8 +84,8 @@ public class GuiExportCmd implements CommandExecutor {
         return false;
     }
 
-    public static GUI.XmlGui convert(Inventory inv) {
-        GUI.XmlGui xmlGui = new GUI.XmlGui();
+    public static GUI.DataGui convert(Inventory inv) {
+        GUI.DataGui xmlGui = new GUI.DataGui();
         for(int i = 0; i < inv.getContents().length; i++) {
             ItemStack is = inv.getContents()[i];
             if(is != null) {
@@ -130,7 +130,7 @@ public class GuiExportCmd implements CommandExecutor {
                 }
                 if(!is.getEnchantments().isEmpty()) {
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
-                        GUI.XmlEnchantment xmlEnchantment = new GUI.XmlEnchantment();
+                        GUI.GuiEnchantment xmlEnchantment = new GUI.GuiEnchantment();
                         xmlEnchantment.enchantment = entry.getKey();
                         xmlEnchantment.level = entry.getValue();
                         xmlItem.enchantments.add(xmlEnchantment);

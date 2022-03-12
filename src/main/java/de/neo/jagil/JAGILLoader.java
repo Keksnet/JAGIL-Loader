@@ -16,5 +16,6 @@ public class JAGILLoader extends JavaPlugin {
 
 		this.getLogger().info("JAGIL loaded!");
 		JAGIL.init(this, false);
+		JAGIL.loaderPlugin = this;
 	}
 }

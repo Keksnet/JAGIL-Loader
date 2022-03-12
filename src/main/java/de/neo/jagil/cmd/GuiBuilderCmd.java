@@ -35,18 +35,18 @@ public class GuiBuilderCmd implements CommandExecutor {
 
     private class BuilderGui extends GUI {
 
-        private final GUI.XmlGui xmlGui;
+        private final GUI.DataGui xmlGui;
         private final Path file;
 
         public BuilderGui(String file, OfflinePlayer p) throws XMLStreamException, IOException {
             super(Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file), p);
             this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
-            this.xmlGui = new GUI.XmlGui();
+            this.xmlGui = new GUI.DataGui();
         }
 
         public BuilderGui(String name, int size, String file, OfflinePlayer p) {
             super(name, size, p);
-            this.xmlGui = new GUI.XmlGui();
+            this.xmlGui = new GUI.DataGui();
             this.xmlGui.size = size;
             this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
         }
@@ -106,7 +106,7 @@ public class GuiBuilderCmd implements CommandExecutor {
                         }
                     }
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
-                        XmlEnchantment xmlEnchantment = new XmlEnchantment();
+                        GuiEnchantment xmlEnchantment = new GuiEnchantment();
                         xmlEnchantment.enchantment = entry.getKey();
                         xmlEnchantment.level = entry.getValue();
                         xmlItem.enchantments.add(xmlEnchantment);
@@ -136,7 +136,7 @@ public class GuiBuilderCmd implements CommandExecutor {
         }
     }
 
-    public static void writeInventoryToFile(GUI.XmlGui json, Path saveFile) throws IOException, XMLStreamException {
+    public static void writeInventoryToFile(GUI.DataGui json, Path saveFile) throws IOException, XMLStreamException {
         BufferedWriter osw = Files.newBufferedWriter(saveFile);
         XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(osw);
         writer.writeStartDocument();
@@ -148,7 +148,7 @@ public class GuiBuilderCmd implements CommandExecutor {
         writer.writeCharacters(String.valueOf(json.size));
         writer.writeEndElement();
         writer.writeStartElement("items");
-        for(GUI.XmlItem item : json.items.values()) {
+        for(GUI.GuiItem item : json.items.values()) {
             writer.writeStartElement("item");
 
             writer.writeStartElement("id");
@@ -192,7 +192,7 @@ public class GuiBuilderCmd implements CommandExecutor {
             writer.writeStartElement("enchantments");
 
             if(item.enchantments != null) {
-                for(GUI.XmlEnchantment enchantment : item.enchantments) {
+                for(GUI.GuiEnchantment enchantment : item.enchantments) {
                     writer.writeStartElement("enchantment");
 
                     writer.writeStartElement("enchantmentName");
