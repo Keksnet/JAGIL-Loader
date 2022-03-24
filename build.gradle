@@ -16,7 +16,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '3.3.4'
+version = '3.3.7'
 
 repositories {
 	mavenCentral()
@@ -38,5 +38,11 @@ repositories {
 dependencies {
 	compileOnly 'com.mojang:authlib:2.1.28'
 	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-	implementation 'de.neo.jagil:JAGIL:3.3.4'
+	implementation 'de.neo.jagil:JAGIL:3.3.7'
+}
+
+processResources {
+	filesMatching("plugin.yml") {
+		expand 'version': version
+	}
 }

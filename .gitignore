@@ -7,3 +7,7 @@
 build
 bin
 gradle
+/gradle/
+/.settings/
+/bin/
+/.idea/
