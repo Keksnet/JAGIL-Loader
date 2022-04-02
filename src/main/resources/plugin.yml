@@ -1,6 +1,6 @@
 name: JAGIL
 version: ${version}
-api-version: 1.17
+api-version: 1.8
 author: Neo8
 main: de.neo.jagil.JAGILLoader
 commands:
