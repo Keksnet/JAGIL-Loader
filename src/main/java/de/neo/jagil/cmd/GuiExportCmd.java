@@ -71,7 +71,7 @@ public class GuiExportCmd implements CommandExecutor {
                         gui.name = name;
                         try {
                             GuiBuilderCmd.writeInventoryToFile(gui, file);
-                        } catch (IOException | XMLStreamException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                         p.sendMessage("§aExported GUI!");
