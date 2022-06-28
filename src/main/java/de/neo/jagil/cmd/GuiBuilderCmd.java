@@ -1,8 +1,14 @@
 package de.neo.jagil.cmd;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import de.neo.jagil.JAGILLoader;
 import de.neo.jagil.gui.GUI;
+import de.neo.jagil.gui.GuiTypes;
+import de.neo.jagil.manager.GuiReaderManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,8 +29,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,19 +43,15 @@ public class GuiBuilderCmd implements CommandExecutor {
 
     private class BuilderGui extends GUI {
 
-        private final GUI.DataGui xmlGui;
         private final Path file;
 
-        public BuilderGui(String file, OfflinePlayer p) throws XMLStreamException, IOException {
-            super(Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file), p);
-            this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
-            this.xmlGui = new GUI.DataGui();
+        public BuilderGui(GuiTypes.DataGui gui, Path path, OfflinePlayer p) {
+            super(gui, p);
+            this.file = path;
         }
 
         public BuilderGui(String name, int size, String file, OfflinePlayer p) {
             super(name, size, p);
-            this.xmlGui = new GUI.DataGui();
-            this.xmlGui.size = size;
             this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
         }
 
@@ -62,20 +66,20 @@ public class GuiBuilderCmd implements CommandExecutor {
         }
 
         @Override
-        public GUI handleClose(InventoryCloseEvent e) {
+        public void handleClose(InventoryCloseEvent e) {
             for(int i = 0; i < getInventory().getContents().length; i++) {
                 ItemStack is = getInventory().getContents()[i];
                 if(is != null) {
-                    XmlHead xmlItem = new XmlHead();
-                    xmlItem.slot = i;
-                    xmlItem.material = is.getType();
-                    if(xmlItem.material.equals(Material.PLAYER_HEAD)) {
+                    GuiTypes.GuiItem guiItem = new GuiTypes.GuiItem();
+                    guiItem.slot = i;
+                    guiItem.material = is.getType();
+                    if(guiItem.material.equals(Material.PLAYER_HEAD)) {
                         SkullMeta skullMeta = (SkullMeta) is.getItemMeta();
                         try {
                             Field profileField = skullMeta.getClass().getDeclaredField("profile");
                             profileField.setAccessible(true);
                             GameProfile gp = (GameProfile) profileField.get(skullMeta);
-                            xmlItem.texture = gp.getProperties().get("textures").iterator().next().getValue();
+                            guiItem.texture = gp.getProperties().get("textures").iterator().next().getValue();
                         } catch (IllegalAccessException | NoSuchFieldException ex) {
                             ex.printStackTrace();
                             StringBuilder dump = new StringBuilder();
@@ -106,28 +110,27 @@ public class GuiBuilderCmd implements CommandExecutor {
                         }
                     }
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
-                        GuiEnchantment xmlEnchantment = new GuiEnchantment();
-                        xmlEnchantment.enchantment = entry.getKey();
-                        xmlEnchantment.level = entry.getValue();
-                        xmlItem.enchantments.add(xmlEnchantment);
+                        GuiTypes.GuiEnchantment guiEnchantment = new GuiTypes.GuiEnchantment();
+                        guiEnchantment.enchantment = entry.getKey();
+                        guiEnchantment.level = entry.getValue();
+                        guiItem.enchantments.add(guiEnchantment);
                     }
                     if(is.hasItemMeta()) {
-                        xmlItem.name = is.getItemMeta().getDisplayName();
-                        xmlItem.lore = is.getItemMeta().getLore();
+                        guiItem.name = is.getItemMeta().getDisplayName();
+                        guiItem.lore = is.getItemMeta().getLore();
                     }else {
-                        xmlItem.lore = new ArrayList<>();
+                        guiItem.lore = new ArrayList<>();
                     }
-                    xmlItem.amount = is.getAmount();
-                    xmlGui.items.put(xmlItem.slot, xmlItem);
+                    guiItem.amount = is.getAmount();
+                    getGuiData().items.put(guiItem.slot, guiItem);
                 }
             }
             try {
-                writeInventoryToFile(this.xmlGui, this.file);
-            } catch (IOException | XMLStreamException ex) {
+                writeInventoryToFile(getGuiData(), this.file);
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
             getPlayer().sendMessage("§aGUI saved.");
-            return this;
         }
 
         @Override
@@ -136,86 +139,57 @@ public class GuiBuilderCmd implements CommandExecutor {
         }
     }
 
-    public static void writeInventoryToFile(GUI.DataGui json, Path saveFile) throws IOException, XMLStreamException {
-        BufferedWriter osw = Files.newBufferedWriter(saveFile);
-        XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(osw);
-        writer.writeStartDocument();
-        writer.writeStartElement("gui");
-        writer.writeStartElement("name");
-        writer.writeCharacters(json.name);
-        writer.writeEndElement();
-        writer.writeStartElement("size");
-        writer.writeCharacters(String.valueOf(json.size));
-        writer.writeEndElement();
-        writer.writeStartElement("items");
-        for(GUI.GuiItem item : json.items.values()) {
-            writer.writeStartElement("item");
+    public static void writeInventoryToFile(GuiTypes.DataGui gui, Path saveFile) throws IOException {
+        JsonObject jsonGui = new JsonObject();
+        jsonGui.addProperty("name", gui.name);
+        jsonGui.addProperty("size", gui.size);
+        if(gui.animationMod != 0) jsonGui.addProperty("animationTick", gui.animationMod);
 
-            writer.writeStartElement("id");
-            writer.writeCharacters(item.id);
-            writer.writeEndElement();
+        JsonArray items = new JsonArray();
 
-            writer.writeStartElement("slot");
-            writer.writeCharacters(String.valueOf(item.slot));
-            writer.writeEndElement();
+        for(GuiTypes.GuiItem guiItem : gui.items.values()) {
+            JsonObject item = new JsonObject();
 
-            writer.writeStartElement("material");
-            writer.writeCharacters(item.material.toString());
-            writer.writeEndElement();
-
-            writer.writeStartElement("name");
-            writer.writeCharacters(item.name);
-            writer.writeEndElement();
-
-            writer.writeStartElement("amount");
-            writer.writeCharacters(String.valueOf(item.amount));
-            writer.writeEndElement();
-
-            writer.writeStartElement("lore");
-
-            if(item.lore != null) {
-                for(String line : item.lore) {
-                    writer.writeStartElement("line");
-                    writer.writeCharacters(line);
-                    writer.writeEndElement();
+            if(!guiItem.id.isEmpty()) item.addProperty("id", guiItem.id);
+            item.addProperty("slot", guiItem.slot);
+            item.addProperty("material", guiItem.material.name());
+            if(!guiItem.name.isEmpty()) item.addProperty("name", guiItem.name);
+            if(guiItem.amount != 1) item.addProperty("amount", guiItem.amount);
+            if(!guiItem.lore.isEmpty()) {
+                JsonArray lore = new JsonArray();
+                for(String line : guiItem.lore) {
+                    lore.add(line);
                 }
+                item.add("lore", lore);
             }
-
-            writer.writeEndElement();
-
-            if(item.material.equals(Material.PLAYER_HEAD)) {
-                writer.writeStartElement("base64");
-                writer.writeCharacters(((GUI.XmlHead)item).texture);
-                writer.writeEndElement();
-            }
-
-            writer.writeStartElement("enchantments");
-
-            if(item.enchantments != null) {
-                for(GUI.GuiEnchantment enchantment : item.enchantments) {
-                    writer.writeStartElement("enchantment");
-
-                    writer.writeStartElement("enchantmentName");
-                    writer.writeCharacters(enchantment.enchantment.toString().toUpperCase());
-                    writer.writeEndElement();
-
-                    writer.writeStartElement("enchantmentLevel");
-                    writer.writeCharacters(String.valueOf(enchantment.level));
-                    writer.writeEndElement();
-
-                    writer.writeEndElement();
+            if(!guiItem.enchantments.isEmpty()) {
+                JsonArray enchantments = new JsonArray();
+                for(GuiTypes.GuiEnchantment enchantment : guiItem.enchantments) {
+                    JsonObject ench = new JsonObject();
+                    ench.addProperty("name", enchantment.enchantment.toString().toUpperCase());
+                    ench.addProperty("level", enchantment.level);
+                    enchantments.add(ench);
                 }
+                item.add("enchantments", enchantments);
+            }
+            if(!guiItem.texture.isEmpty()) item.addProperty("base64", guiItem.texture);
+            if(guiItem.customModelData != 0) item.addProperty("modelData", guiItem.customModelData);
+            if(!guiItem.animationFrames.isEmpty()) {
+                JsonArray frames = new JsonArray();
+                for(String frameId : guiItem.animationFrames) {
+                    frames.add(frameId);
+                }
+                item.add("animationFrames", frames);
             }
 
-            writer.writeEndElement();
-
-            writer.writeEndElement();
+            items.add(item);
         }
-        writer.writeEndElement();
-        writer.writeEndElement();
-        writer.writeEndDocument();
-        writer.flush();
-        writer.close();
+
+        jsonGui.add("items", items);
+
+        try(OutputStream out = Files.newOutputStream(saveFile)) {
+            out.write(jsonGui.toString().getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     @Override
@@ -238,8 +212,11 @@ public class GuiBuilderCmd implements CommandExecutor {
                 }else if(args.length == 1) {
                     String file = args[0];
                     try {
-                        new BuilderGui(file, p).show();
-                    } catch (XMLStreamException | IOException e) {
+                        Path path = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class)
+                                .getDataFolder().getAbsolutePath(), file);
+                        GuiTypes.DataGui gui = GuiReaderManager.getInstance().readFile(path);
+                        new BuilderGui(gui, path, p).show();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }else {

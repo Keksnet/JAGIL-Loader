@@ -3,6 +3,7 @@ package de.neo.jagil.cmd;
 import com.mojang.authlib.GameProfile;
 import de.neo.jagil.JAGILLoader;
 import de.neo.jagil.gui.GUI;
+import de.neo.jagil.gui.GuiTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -65,7 +66,7 @@ public class GuiExportCmd implements CommandExecutor {
                         p.sendMessage("§aSize: " + size);
                         p.sendMessage("§aFile: " + file);
                         p.sendMessage("§aName: " + name);
-                        GUI.DataGui gui = convert(container.getInventory());
+                        GuiTypes.DataGui gui = convert(container.getInventory());
                         gui.size = size;
                         gui.name = name;
                         try {
@@ -84,12 +85,12 @@ public class GuiExportCmd implements CommandExecutor {
         return false;
     }
 
-    public static GUI.DataGui convert(Inventory inv) {
-        GUI.DataGui xmlGui = new GUI.DataGui();
+    public static GuiTypes.DataGui convert(Inventory inv) {
+        GuiTypes.DataGui xmlGui = new GuiTypes.DataGui();
         for(int i = 0; i < inv.getContents().length; i++) {
             ItemStack is = inv.getContents()[i];
             if(is != null) {
-                GUI.XmlHead xmlItem = new GUI.XmlHead();
+                GuiTypes.GuiItem xmlItem = new GuiTypes.GuiItem();
                 xmlItem.slot = i;
                 xmlItem.material = is.getType();
                 if(xmlItem.material.equals(Material.PLAYER_HEAD)) {
@@ -130,7 +131,7 @@ public class GuiExportCmd implements CommandExecutor {
                 }
                 if(!is.getEnchantments().isEmpty()) {
                     for(Map.Entry<Enchantment, Integer> entry : is.getEnchantments().entrySet()) {
-                        GUI.GuiEnchantment xmlEnchantment = new GUI.GuiEnchantment();
+                        GuiTypes.GuiEnchantment xmlEnchantment = new GuiTypes.GuiEnchantment();
                         xmlEnchantment.enchantment = entry.getKey();
                         xmlEnchantment.level = entry.getValue();
                         xmlItem.enchantments.add(xmlEnchantment);

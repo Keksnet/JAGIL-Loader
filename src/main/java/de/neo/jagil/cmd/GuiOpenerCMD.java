@@ -3,6 +3,8 @@ package de.neo.jagil.cmd;
 import com.mojang.authlib.GameProfile;
 import de.neo.jagil.JAGILLoader;
 import de.neo.jagil.gui.GUI;
+import de.neo.jagil.gui.GuiTypes;
+import de.neo.jagil.manager.GuiReaderManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -31,20 +33,16 @@ public class GuiOpenerCMD implements CommandExecutor {
 
     private class OpenedGUI extends GUI {
 
-        private final GUI.DataGui xmlGui;
         private final Path file;
 
-        public OpenedGUI(String file, OfflinePlayer p) throws XMLStreamException, IOException {
-            super(Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file), p);
-            this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
-            this.xmlGui = new GUI.DataGui();
+        public OpenedGUI(GuiTypes.DataGui gui, Path path, OfflinePlayer p) {
+            super(gui, p);
+            this.file = path;
         }
 
-        public OpenedGUI(String name, int size, String file, OfflinePlayer p) {
+        public OpenedGUI(String name, int size, Path path, OfflinePlayer p) {
             super(name, size, p);
-            this.xmlGui = new GUI.DataGui();
-            this.xmlGui.size = size;
-            this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
+            this.file = path;
         }
 
         @Override
@@ -65,8 +63,11 @@ public class GuiOpenerCMD implements CommandExecutor {
                 if(args.length == 1) {
                     String file = args[0];
                     try {
-                        new OpenedGUI(file, p).show();
-                    } catch (XMLStreamException | IOException e) {
+                        Path path = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class)
+                                .getDataFolder().getAbsolutePath(), file);
+                        GuiTypes.DataGui gui = GuiReaderManager.getInstance().readFile(path);
+                        new OpenedGUI(gui, path, p).show();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }else {
