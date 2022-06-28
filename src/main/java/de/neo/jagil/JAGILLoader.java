@@ -17,7 +17,7 @@ public class JAGILLoader extends JavaPlugin {
 		getCommand("guiopener").setExecutor(new GuiOpenerCMD());
 
 		this.getLogger().info("JAGIL loaded!");
-		JAGIL.init(this, false);
+		JAGIL.init(this);
 		JAGIL.loaderPlugin = this;
 	}
 }
