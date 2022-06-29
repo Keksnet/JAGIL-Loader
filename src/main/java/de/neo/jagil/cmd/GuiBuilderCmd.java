@@ -176,8 +176,18 @@ public class GuiBuilderCmd implements CommandExecutor {
             if(guiItem.customModelData != 0) item.addProperty("modelData", guiItem.customModelData);
             if(!guiItem.animationFrames.isEmpty()) {
                 JsonArray frames = new JsonArray();
-                for(String frameId : guiItem.animationFrames) {
-                    frames.add(frameId);
+                for(GuiTypes.GuiAnimationFrame frame : guiItem.animationFrames) {
+                    JsonObject frameJson = new JsonObject();
+
+                    frameJson.addProperty("itemId", frame.itemId);
+
+                    JsonObject position = new JsonObject();
+                    position.addProperty("x", frame.position.x);
+                    position.addProperty("y", frame.position.y);
+
+                    frameJson.add("pos", position);
+
+                    frames.add(frameJson);
                 }
                 item.add("animationFrames", frames);
             }
