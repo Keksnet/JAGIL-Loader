@@ -1,5 +1,5 @@
 name: JAGIL
-version: 4.0-alpha.8
+version: 4.0-alpha.11-SNAPSHOT
 api-version: 1.13
 author: Neo8
 main: de.neo.jagil.JAGILLoader

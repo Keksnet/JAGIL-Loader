@@ -47,6 +47,7 @@ public class GuiOpenerCMD implements CommandExecutor {
 
         @Override
         public boolean handle(InventoryClickEvent e) {
+            super.handle(e);
             return false;
         }
 
