@@ -8,7 +8,9 @@ compileJava.options.encoding = 'UTF-8'
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '4.0-alpha.17'
+version = '4.0-beta.2'
+
+targetCompatibility = 17
 
 repositories {
 	mavenCentral()
@@ -28,7 +30,7 @@ repositories {
 }
 
 dependencies {
-	compileOnly 'com.mojang:authlib:2.1.28'
-	compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-	implementation 'de.neo.jagil:JAGIL:4.0-alpha.17'
+	compileOnly 'com.mojang:authlib:3.11.50'
+	compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
+	implementation 'de.neo.jagil:JAGIL:' + version
 }
