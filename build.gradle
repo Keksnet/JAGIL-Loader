@@ -8,7 +8,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = 'de.neo.jagil'
 archivesBaseName = 'JAGIL-Loader'
-version = '4.0-beta.2'
+version = '4.0-beta.3'
 
 targetCompatibility = 17
 
