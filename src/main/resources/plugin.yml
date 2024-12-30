@@ -1,9 +1,9 @@
 name: JAGIL
-version: 4.0-beta.5
-api-version: 1.13
+version: 4.0-beta.32
+api-version: 1.21
 author: Neo8
 main: de.neo.jagil.JAGILLoader
 commands:
-  guibuilder:
-  guiexport:
-  guiopener:
+  guibuilder: {}
+  guiexport: {}
+  guiopener: {}

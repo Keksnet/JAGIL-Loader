@@ -1,46 +1,13 @@
 package de.neo.jagil.cmd;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
-import de.neo.jagil.JAGILLoader;
-import de.neo.jagil.gui.GUI;
-import de.neo.jagil.gui.GuiTypes;
-import de.neo.jagil.manager.GuiReaderManager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class GuiBuilderCmd implements CommandExecutor {
 
+    /*
     private class BuilderGui extends GUI {
 
         private final Path file;
@@ -50,7 +17,7 @@ public class GuiBuilderCmd implements CommandExecutor {
             this.file = path;
         }
 
-        public BuilderGui(String name, int size, String file, OfflinePlayer p) {
+        public BuilderGui(Component name, int size, String file, OfflinePlayer p) {
             super(name, size, p);
             this.file = Paths.get(JAGILLoader.getPlugin(JAGILLoader.class).getDataFolder().getAbsolutePath(), file);
         }
@@ -201,9 +168,14 @@ public class GuiBuilderCmd implements CommandExecutor {
             out.write(jsonGui.toString().getBytes(StandardCharsets.UTF_8));
         }
     }
+    */
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        sender.sendMessage(Component.text("Not yet supported for JAGIL v4"));
+        return true;
+
+        /*
         if(sender instanceof Player p) {
             if(p.hasPermission("jagil.builder")) {
                 if(args.length >= 3) {
@@ -239,6 +211,7 @@ public class GuiBuilderCmd implements CommandExecutor {
             sender.sendMessage("Only a player can use this command!");
         }
         return false;
+         */
     }
 
 }
