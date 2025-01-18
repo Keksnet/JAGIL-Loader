@@ -1,5 +1,5 @@
 name: JAGIL
-version: 4.0-beta.36
+version: 4.0-beta.37
 api-version: 1.21
 author: Neo8
 softdepend: [HeadDatabase]
