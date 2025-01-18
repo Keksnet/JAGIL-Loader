@@ -1,7 +1,8 @@
 name: JAGIL
-version: 4.0-beta.32
+version: 4.0-beta.36
 api-version: 1.21
 author: Neo8
+softdepend: [HeadDatabase]
 main: de.neo.jagil.JAGILLoader
 commands:
   guibuilder: {}

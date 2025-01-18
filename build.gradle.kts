@@ -5,7 +5,7 @@ plugins {
 
 group = "de.neo.jagil"
 description = "JAGIL-Loader"
-version = "4.0-beta.32"
+version = "4.0-beta.36"
 
 java {
 	toolchain.languageVersion.set(JavaLanguageVersion.of(21))
