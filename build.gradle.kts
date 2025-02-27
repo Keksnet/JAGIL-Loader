@@ -5,7 +5,7 @@ plugins {
 
 group = "de.neo.jagil"
 description = "JAGIL-Loader"
-version = "4.0-beta.37"
+version = "4.0-beta.38"
 
 java {
 	toolchain.languageVersion.set(JavaLanguageVersion.of(21))
@@ -27,4 +27,10 @@ repositories {
 dependencies {
 	compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
 	implementation("de.neo8.jagil:JAGIL:$version")
+}
+
+tasks.processResources {
+	files("plugin.yml") {
+		expand("pluginVersion" to version)
+	}
 }
