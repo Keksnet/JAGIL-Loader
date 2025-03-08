@@ -1,3 +1,6 @@
 loaderName: JAGIL
 debugMode: false
+cacheConfig:
+  enabled: true
+  providerConfig: {}
 disabledFeatures: []

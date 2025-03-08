@@ -4,6 +4,8 @@ api-version: 1.21
 author: Neo8
 softdepend: [HeadDatabase]
 main: de.neo.jagil.JAGILLoader
+libraries:
+  - com.h2database:h2:2.3.232
 commands:
   guibuilder: {}
   guiexport: {}
